@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ComproMío MX</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: #f5f5f5; color: #333; }
+
+    header {
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      color: white;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+    header h1 { font-size: 2rem; }
+    header p { margin-top: 0.5rem; opacity: 0.9; }
+
+    .bienvenida {
+      position: absolute;
+      top: 50%;
+      right: 2rem;
+      transform: translateY(-50%);
+      font-weight: 600;
+    }
+
+    .navegacion {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px 18px;
+      padding: 12px 15px;
+      background-color: #f0f4f8;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+    }
+    .navegacion a {
+      text-decoration: none;
+      color: #004080;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 6px 4px;
+      transition: all 0.2s;
+    }
+    .navegacion a:hover {
+      color: #0066cc;
+      border-bottom: 2px solid #0066cc;
+    }
+
+    .oculto { display: none !important; }
+
+    main { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    h2 { text-align: center; margin-bottom: 2rem; color: #1e3a8a; }
+
+    .productos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+    .producto {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .producto:hover { transform: translateY(-5px); }
+    .producto img {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      margin-bottom: 1rem;
+      background: #fff;
+    }
+    .producto h3 { margin-bottom: 0.5rem; }
+    .precio { font-size: 1.5rem; font-weight: bold; color: #dc2626; margin-bottom: 1rem; }
+
+    .btn {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s;
+    }
+    .btn-primary { background: #0066cc; color: white; }
+    .btn-primary:hover { background: #0052a3; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-success:hover { background: #218838; }
+    .btn-danger { background: #dc3545; color: white; }
+
+    .formulario {
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .form-grupo { margin-bottom: 1.2rem; }
+    .form-grupo label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+    .form-grupo input,
+    .form-grupo textarea,
+    .form-grupo select {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .mensaje { margin-top: 1rem; padding: 1rem; border-radius: 6px; text-align: center; }
+    .exito { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+
+    @media (max-width: 480px) {
+      .navegacion { gap: 8px 12px; padding: 10px 8px; }
+      .navegacion a { font-size: 14px; }
+      header h1 { font-size: 1.5rem; }
+      main { padding: 1rem; }
+      .productos { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>ComproMío MX</h1>
+  <p>Tu tienda de confianza</p>
+  <div id="bienvenida" class="bienvenida oculto">Bienvenido, <span id="nombre-cliente"></span> 👋</div>
+</header>
+
+<nav class="navegacion">
+  <a href="#" onclick="mostrarSeccion('inicio')">Inicio</a>
+  <a href="#" onclick="mostrarSeccion('carrito')">Mi Carrito</a>
+  <a href="#" id="link-login" onclick="mostrarSeccion('login')">Iniciar Sesión</a>
+  <a href="#" id="link-registro" onclick="mostrarSeccion('registro')">Registrarse</a>
+  <a href="#" id="link-cerrar" class="oculto" onclick="cerrarSesion()">Cerrar Sesión</a>
+</nav>
+
+<main>
+  <!-- INICIO / PRODUCTOS -->
+  <section id="inicio">
+    <h2>Nuestros Productos</h2>
+    <div class="productos" id="lista-productos"></div>
+  </section>
+
+  <!-- CARRITO -->
+  <section id="carrito" class="oculto">
+    <h2>🛒 Mi Carrito</h2>
+    <div id="lista-carrito"></div>
+    <p style="font-size: 1.5rem; font-weight: bold; text-align: right; margin: 1rem 0;">
+      Total: $<span id="total-carrito">0</span> MXN
+    </p>
+    <button class="btn btn-success" onclick="mostrarSeccion('datos')">💳 Proceder a Pagar</button>
+  </section>
+
+  <!-- COMPLETAR DATOS -->
+  <section id="datos" class="formulario oculto">
+    <h2>📝 Completa tus Datos</h2>
+    <div class="form-grupo">
+      <label>Nombre completo</label>
+      <input type="text" id="nombre-compra" required>
+    </div>
+    <div class="form-grupo">
+      <label>Correo electrónico</label>
+      <input type="email" id="correo-compra" required>
+    </div>
+    <div class="form-grupo">
+      <label>Teléfono</label>
+      <input type="tel" id="telefono-compra" required>
+    </div>
+    <div class="form-grupo">
+      <label>Dirección de entrega</label>
+      <textarea id="direccion-compra" rows="3" required></textarea>
+    </div>
+    <div class="form-grupo">
+      <label>Método de pago</label>
+      <select id="metodo-pago" required>
+        <option value="">-- Selecciona una opción --</option>
+        <option value="efectivo">💵 Efectivo</option>
+        <option value="transferencia">🏦 Transferencia Bancaria</option>
+        <option value="tarjeta">💳 Tarjeta de Crédito / Débito</option>
+        <option value="oxxo">🏪 Pago en Oxxo</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="finalizarCompra()">✅ Confirmar Compra</button>
+    <div id="mensaje-compra" class="mensaje"></div>
+  </section>
+
+  <!-- INICIAR SESIÓN -->
+  <section id="login" class="formulario oculto">
+    <h2>🔑 Iniciar Sesión</h2>
+    <div class="form-grupo">
+      <label>Correo electrónico</label>
+      <input type="email" id="login-correo" required>
+    </div>
+    <div class="form-grupo">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" required>
+    </div>
+    <button class="btn btn-primary" onclick="iniciarSesion()">✅ Entrar</button>
+    
+    <p style="text-align:center; margin-top:1rem;">
+      <a href="#" onclick="mostrarSeccion('recuperar')" style="color:#0066cc; text-decoration:none;">¿Olvidaste tu contraseña?</a>
+    </p>
+    
+    <div id="mensaje-login" class="mensaje"></div>
+  </section>
+
+  <!-- RECUPERAR CONTRASEÑA -->
+  <section id="recuperar" class="formulario oculto">
+    <h2>🔓 Recuperar Contraseña</h2>
+    <p style="text-align:center; color:#666; margin-bottom:1.5rem;">
+      Escribe tu correo y te enviaremos tu contraseña.
+    </p>
+    <div class="form-grupo">
+      <label>Tu correo electrónico</label>
+      <input type="email" id="correo-recuperar" required>
+    </div>
+    <button class="btn btn-primary" onclick="enviarRecuperacion()">📧 Enviar Contraseña</button>
+    <p style="text-align:center; margin-top:1rem;">
+      <a href="#" onclick="mostrarSeccion('login')" style="color:#0066cc; text-decoration:none;">← Volver a Iniciar Sesión</a>
+    </p>
+    <div id="mensaje-recuperar" class="mensaje"></div>
+  </section>
+
+  <!-- REGISTRO -->
+  <section id="registro" class="formulario oculto">
+    <h2>📝 Crear Cuenta</h2>
+    <div class="form-grupo">
+      <label>Nombre completo</label>
+      <input type="text" id="reg-nombre" required>
+    </div>
+    <div class="form-grupo">
+      <label>Correo electrónico</label>
+      <input type="email" id="reg-correo" required>
+    </div>
+    <div class="form-grupo">
+      <label>Teléfono</label>
+      <input type="tel" id="reg-telefono" required>
+    </div>
+    <div class="form-grupo">
+      <label>Contraseña</label>
+      <input type="password" id="reg-pass" required>
+    </div>
+    <button class="btn btn-primary" onclick="registrarse()">✅ Crear Cuenta</button>
+    <div id="mensaje-registro" class="mensaje"></div>
+  </section>
+</main>
+
+<script>
+// ============= PRODUCTOS =============
+const productos = [
+  { id: 1, nombre: 'Audífonos', precio: 350, imagen: 'public/imagenes/audifonos.jpg' },
+  { id: 2, nombre: 'Batidora', precio: 480, imagen: 'public/imagenes/batidora.jpg' },
+  { id: 3, nombre: 'Camiseta', precio: 180, imagen: 'public/imagenes/camiseta.jpg' },
+  { id: 4, nombre: 'Celular', precio: 2500, imagen: 'public/imagenes/celular.jpg' },
+  { id: 5, nombre: 'Laptop', precio: 5200, imagen: 'public/imagenes/laptop.jpg' },
+  { id: 6, nombre: 'Reloj', precio: 650, imagen: 'public/imagenes/reloj.jpg' },
+  { id: 7, nombre: 'Tenis', precio: 890, imagen: 'public/imagenes/tenis.jpg' },
+  { id: 8, nombre: 'TV', precio: 3200, imagen: 'public/imagenes/tv.jpg' }
+];
+
+function cargarProductos() {
+  const contenedor = document.getElementById('lista-productos');
+  contenedor.innerHTML = productos.map(p => `
+    <div class="producto">
+      <img src="${p.imagen}" alt="${p.nombre}" 
+           onerror="this.style.background='#f0f0f0'; this.alt='Imagen no encontrada'">
+      <h3>${p.nombre}</h3>
+      <p class="precio">$${p.precio.toLocaleString()} MXN</p>
+      <button class="btn btn-primary" onclick="agregarAlCarrito(${p.id})">🛒 Agregar al Carrito</button>
+    </div>
+  `).join('');
+}
+
+// ============= NAVEGACIÓN =============
+function mostrarSeccion(id) {
+  document.querySelectorAll('section').forEach(sec => sec.classList.add('oculto'));
+  document.getElementById(id).classList.remove('oculto');
+}
+
+// ============= CARRITO =============
+let carrito = [];
+
+function agregarAlCarrito(id) {
+  const prod = productos.find(p => p.id === id);
+  carrito.push({ ...prod });
+  actualizarCarrito();
+  alert(`✅ ${prod.nombre} agregado al carrito`);
+}
+
+function actualizarCarrito() {
+  const lista = document.getElementById('lista-carrito');
+  const total = carrito.reduce((s, p) => s + p.precio, 0);
+  
+  if (carrito.length === 0) {
+    lista.innerHTML = '<p style="text-align:center; color:#666; padding:2rem;">🛒 Tu carrito está vacío</p>';
+  } else {
+    lista.innerHTML = carrito.map((p, i) => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.8rem 0; border-bottom:1px solid #eee;">
+        <div>
+          <strong>${p.nombre}</strong><br>
+          $${p.precio.toLocaleString()} MXN
+        </div>
+        <button style="background:#dc3545; color:white; border:none; padding:0.5rem 1rem; border-radius:4px; cursor:pointer;" 
+                onclick="carrito.splice(${i},1); actualizarCarrito();">✕</button>
+      </div>
+    `).join('');
+  }
+  document.getElementById('total-carrito').textContent = total.toLocaleString();
+}
+
+// ============= COMPRA =============
+async function finalizarCompra() {
+  if (carrito.length === 0) {
+    alert('🛒 El carrito está vacío');
+    return;
+  }
+
+  const nombre = document.getElementById('nombre-compra').value;
+  const correo = document.getElementById('correo-compra').value;
+  const telefono = document.getElementById('telefono-compra').value;
+  const direccion = document.getElementById('direccion-compra').value;
+  const metodoPago = document.getElementById('metodo-pago').value;
+
+  if (!nombre || !correo || !telefono || !direccion || !metodoPago) {
+    alert('⚠️ Completa todos los campos');
+    return;
+  }
+
+  const total = carrito.reduce((s, p) => s + p.precio, 0);
+  const numeroPedido = 'PED-' + Date.now();
+  let referencia = '';
+  let infoPago = '';
+
+  if (metodoPago === 'oxxo') {
+    referencia = 'REF-' + Math.floor(Math.random() * 900000000000 + 100000000000);
+    infoPago = `🏪 Pago en OXXO\n📌 Referencia: ${referencia}\n💰 Monto: $${total.toLocaleString()} MXN`;
+  } else if (metodoPago === 'tarjeta') {
+    const numTarjeta = prompt('💳 Número de tarjeta (16 dígitos):');
+    if (!numTarjeta || numTarjeta.replace(/\s/g,'').length !== 16) {
+      alert('⚠️ Número de tarjeta inválido');
+      return;
+    }
+    const vencimiento = prompt('📅 Fecha de vencimiento (MM/AA):');
+    const cvv = prompt('🔒 Código de seguridad (CVV):');
+    const titular = prompt('👤 Nombre del titular:');
+    referencia = numTarjeta.slice(-4);
+    infoPago = `💳 Tarjeta terminación: **** **** **** ${referencia}\n👤 Titular: ${titular}\n📅 Vence: ${vencimiento}\n✅ Pago procesado`;
+  } else if (metodoPago === 'transferencia') {
+    const cuenta = '012345678901234567';
+    const clabe = '012180000000000001';
+    const banco = 'BBVA México';
+    referencia = numeroPedido;
+    infoPago = `🏦 ${banco}\n📄 Cuenta: ${cuenta}\n🔑 CLABE: ${clabe}\n📌 Referencia: ${referencia}\n💰 Monto: $${total.toLocaleString()} MXN`;
+  } else {
+    infoPago = `💵 Pago en efectivo al recibir\n📍 Dirección: ${direccion}\n💰 Monto: $${total.toLocaleString()} MXN`;
+  }
+
+  const res = await fetch('/api/pedido', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      numero: numeroPedido, nombre, correo, telefono, direccion,
+      metodoPago, referencia, total, productos: carrito
+    })
+  });
+
+  const json = await res.json();
+  
+  alert(`✅ ¡Compra confirmada! 🎉\n\n📦 Pedido: ${numeroPedido}\n👤 Cliente: ${nombre}\n💰 Total: $${total.toLocaleString()} MXN\n\n━━━━━━━━━━━━━━━━━━\n${infoPago}\n━━━━━━━━━━━━━━━━━━\n\n📧 Te enviamos los detalles a: ${correo}`);
+
+  carrito = [];
+  actualizarCarrito();
+  document.getElementById('nombre-compra').value = '';
+  document.getElementById('correo-compra').value = '';
+  document.getElementById('telefono-compra').value = '';
+  document.getElementById('direccion-compra').value = '';
+  document.getElementById('metodo-pago').value = '';
+  mostrarSeccion('inicio');
+}
+
+// ============= RECUPERAR CONTRASEÑA =============
+async function enviarRecuperacion() {
+  const correo = document.getElementById('correo-recuperar').value;
+  const msg = document.getElementById('mensaje-recuperar');
+
+  if (!correo) {
+    msg.className = 'mensaje error';
+    msg.textContent = '⚠️ Escribe tu correo';
+    return;
+  }
+const res = await fetch('/api/recuperar-contrasena', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ correo })
+});
+  const json = await res.json();
+  msg.className = json.exito ? 'mensaje exito' : 'mensaje error';
+  msg.textContent = json.mensaje;
+}
+
+// ============= AUTENTICACIÓN =============
+async function registrarse() {
+  const nombre = document.getElementById('reg-nombre').value;
+  const correo = document.getElementById('reg-correo').value;
+  const telefono = document.getElementById('reg-telefono').value;
+  const pass = document.getElementById('reg-pass').value;
+  const msg = document.getElementById('mensaje-registro');
+
+  if (!nombre || !correo || !telefono || !pass) {
+    msg.className = 'mensaje error';
+    msg.textContent = '⚠️ Completa todos los campos';
+    return;
+  }
+
+  const res = await fetch('/api/registro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre, correo, telefono, pass })
+  });
+  const json = await res.json();
+
+  msg.className = json.exito ? 'mensaje exito' : 'mensaje error';
+  msg.textContent = json.mensaje;
+  
+  if (json.exito) {
+    setTimeout(() => mostrarSeccion('login'), 2500);
+  }
+}
+
+async function iniciarSesion() {
+  const correo = document.getElementById('login-correo').value;
+  const pass = document.getElementById('login-pass').value;
+  const msg = document.getElementById('mensaje-login');
+
+  const res = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ correo, pass })
+  });
+  const json = await res.json();
+
+  if (json.exito) {
+    localStorage.setItem('usuario', JSON.stringify(json.usuario));
+    actualizarNavegacion();
+    mostrarSeccion('inicio');
+  } else {
+    msg.className = 'mensaje error';
+    msg.textContent = json.mensaje;
+  }
+}
+
+function cerrarSesion() {
+  localStorage.removeItem('usuario');
+  actualizarNavegacion();
+  mostrarSeccion('inicio');
+}
+
+function actualizarNavegacion() {
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  if (usuario) {
+    document.getElementById('bienvenida').classList.remove('oculto');
+    document.getElementById('nombre-cliente').textContent = usuario.nombre;
+    document.getElementById('link-login').classList.add('oculto');
+    document.getElementById('link-registro').classList.add('oculto');
+    document.getElementById('link-cerrar').classList.remove('oculto');
+  } else {
+    document.getElementById('bienvenida').classList.add('oculto');
+    document.getElementById('link-login').classList.remove('oculto');
+    document.getElementById('link-registro').classList.remove('oculto');
+    document.getElementById('link-cerrar').classList.add('oculto');
+  }
+}
+
+// Iniciar
+cargarProductos();
+actualizarNavegacion();
+</script>
+
+</body>
+</html>

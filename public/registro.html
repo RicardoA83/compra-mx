@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Cuenta - TuTienda México 🇲🇽</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #006341, #ce1126);
+      padding: 20px;
+    }
+    .caja {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 5px;
+      background: linear-gradient(90deg, #006341, #ce1126);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .subtitulo { color: #666; margin-bottom: 25px; }
+    .mensaje {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+      font-weight: 600;
+    }
+    .exito { background: #e8f5e9; color: #2e7d32; display: block !important; }
+    .error { background: #ffebee; color: #c62828; display: block !important; }
+    .campo { text-align: left; margin-bottom: 15px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; color: #333; }
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border 0.2s;
+    }
+    input:focus { outline: none; border-color: #006341; }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(90deg, #006341, #ce1126);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 5px;
+      transition: transform 0.2s;
+    }
+    .btn:hover { transform: scale(1.02); }
+    .enlace { margin-top: 20px; font-size: 14px; color: #666; }
+    .enlace a { color: #006341; font-weight: 700; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="caja">
+    <h1>🇲🇽 TuTienda México</h1>
+    <p class="subtitulo">Crea tu cuenta y empieza a comprar</p>
+
+    <div id="mensaje" class="mensaje"></div>
+
+    <form onsubmit="registrar(event)">
+      <div class="campo">
+        <label>Nombre completo</label>
+        <input type="text" id="nombre" placeholder="Tu nombre" required>
+      </div>
+      <div class="campo">
+        <label>Correo electrónico</label>
+        <input type="email" id="correo" placeholder="tu@correo.com" required>
+      </div>
+      <div class="campo">
+        <label>Contraseña</label>
+        <input type="password" id="contrasena" placeholder="Mínimo 6 caracteres" required>
+      </div>
+      <button type="submit" class="btn">Crear mi cuenta ✅</button>
+    </form>
+
+    <p class="enlace">¿Ya tienes cuenta? <a href="inicio.html">Inicia sesión aquí</a></p>
+  </div>
+
+<script>
+function registrar(e) {
+  e.preventDefault();
+  const nombre = document.getElementById('nombre').value.trim();
+  const correo = document.getElementById('correo').value.trim();
+  const contrasena = document.getElementById('contrasena').value;
+  const msg = document.getElementById('mensaje');
+  msg.className = 'mensaje';
+
+  if (contrasena.length < 6) {
+    msg.textContent = '❌ La contraseña debe tener al menos 6 caracteres';
+    msg.classList.add('error');
+    return;
+  }
+
+  // Obtener usuarios existentes
+  const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+  
+  // Verificar si el correo ya existe
+  if (usuarios.find(u => u.correo === correo)) {
+    msg.textContent = '⚠️ Este correo ya está registrado. Inicia sesión';
+    msg.classList.add('error');
+    return;
+  }
+
+  // Agregar nuevo usuario
+  usuarios.push({ nombre, correo, contrasena });
+  localStorage.setItem('usuarios', JSON.stringify(usuarios));
+  
+  // Iniciar sesión automáticamente
+  localStorage.setItem('usuarioActivo', JSON.stringify({ nombre, correo }));
+
+  msg.textContent = '✅ ¡Cuenta creada con éxito! Redirigiendo...';
+  msg.classList.add('exito');
+
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 1500);
+}
+</script>
+</body>
+</html>
